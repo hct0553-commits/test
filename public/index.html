@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#b5432a">
+  <title>冰箱料理助手</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>冰箱料理助手</h1>
+    <p>拍一張食材照片，看看今晚能煮什麼台灣家常菜</p>
+  </header>
+
+  <main>
+    <!-- 步驟一：上傳照片 -->
+    <section class="card" id="step-photo">
+      <h2><span class="step">1</span>拍下你的食材</h2>
+      <div class="photo-actions">
+        <label class="btn primary">
+          拍照
+          <input type="file" id="camera-input" accept="image/*" capture="environment" hidden>
+        </label>
+        <label class="btn">
+          從相簿選擇
+          <input type="file" id="album-input" accept="image/*" hidden>
+        </label>
+      </div>
+      <img id="preview" alt="食材照片預覽" hidden>
+      <p class="status" id="photo-status" role="status"></p>
+    </section>
+
+    <!-- 步驟二：確認食材 -->
+    <section class="card" id="step-ingredients" hidden>
+      <h2><span class="step">2</span>確認食材</h2>
+      <p class="hint">辨識不一定完全正確，點 × 刪除認錯的，也可以補上照片裡沒拍到的。</p>
+      <p class="note" id="ingredient-note" hidden></p>
+      <ul class="chips" id="ingredient-list"></ul>
+      <form class="add-form" id="add-form">
+        <input type="text" id="add-input" placeholder="新增食材，例如：豆腐" maxlength="30">
+        <button type="submit" class="btn">新增</button>
+      </form>
+      <button class="btn primary wide" id="recipe-button">推薦料理</button>
+      <p class="status" id="recipe-status" role="status"></p>
+    </section>
+
+    <!-- 步驟三：食譜 -->
+    <section id="step-recipes" hidden>
+      <h2 class="section-title"><span class="step">3</span>可以做的菜</h2>
+      <div id="recipe-list"></div>
+    </section>
+  </main>
+
+  <template id="recipe-template">
+    <article class="card recipe">
+      <header>
+        <h3 class="recipe-name"></h3>
+        <p class="recipe-meta"></p>
+        <p class="recipe-desc"></p>
+      </header>
+      <div class="recipe-body">
+        <h4>使用食材</h4>
+        <ul class="recipe-used"></ul>
+        <div class="recipe-missing-block">
+          <h4>需另外準備</h4>
+          <ul class="recipe-missing"></ul>
+        </div>
+        <h4>調味料</h4>
+        <ul class="recipe-seasonings"></ul>
+        <h4>做法</h4>
+        <ol class="recipe-steps"></ol>
+        <p class="recipe-tip"></p>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

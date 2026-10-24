@@ -1,0 +1,9 @@
+{
+  "name": "冰箱料理助手",
+  "short_name": "料理助手",
+  "lang": "zh-Hant-TW",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6f0",
+  "theme_color": "#b5432a"
+}
