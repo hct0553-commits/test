@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fridge-recipe-helper
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      # 金鑰不寫進 repo，建立服務時由 Render 介面提示填入
+      - key: ANTHROPIC_API_KEY
+        sync: false

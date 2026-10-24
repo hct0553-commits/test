@@ -113,6 +113,10 @@ function handleError(res, error) {
 
 // ---------- API ----------
 
+app.get("/healthz", (req, res) => {
+  res.json({ ok: true });
+});
+
 app.post("/api/ingredients", async (req, res) => {
   const { image, mediaType } = req.body ?? {};
   if (typeof image !== "string" || !image || !ALLOWED_MEDIA_TYPES.includes(mediaType)) {

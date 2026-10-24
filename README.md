@@ -41,6 +41,19 @@ npm start
 
 要在手機上測試相機功能，手機與電腦必須在同一個網路，並以 HTTPS 開啟（瀏覽器只在 HTTPS 或 localhost 下開放相機）。最簡單的做法是部署到 Render、Railway、Fly.io 這類平台，或在本機用 ngrok 之類的工具建立 HTTPS 通道。
 
+## 部署到 Render
+
+repo 裡的 `render.yaml` 已經寫好服務設定（Node 環境、新加坡區域、免費方案、健康檢查 `/healthz`）。
+
+1. 登入 [dashboard.render.com](https://dashboard.render.com)，連結 GitHub 帳號。
+2. 點「New」→「Blueprint」，選擇這個 repo。
+3. Render 會提示填入 `ANTHROPIC_API_KEY`，貼上金鑰後按「Apply」。
+4. 建置完成後會得到 `https://<服務名稱>.onrender.com` 網址，手機打開即可拍照使用。
+
+之後每次推送到 repo 的預設分支，Render 都會自動重新部署。
+
+免費方案的服務閒置約 15 分鐘後會休眠，下次開啟需等 30 到 60 秒喚醒。要避免休眠，把 `render.yaml` 中的 `plan: free` 改成 `plan: starter`（付費方案）。
+
 ## 可以調整的地方
 
 - **推薦風格**：修改 `server.js` 中的 `RECIPE_SYSTEM` 提示詞，例如改成「適合小孩」、「低油低鹽」或「十分鐘快手菜」。
