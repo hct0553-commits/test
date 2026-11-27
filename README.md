@@ -21,6 +21,8 @@ public/
   app.js                  拍照、縮圖、食材編輯、食譜呈現
   style.css               樣式（支援深色模式）
   manifest.webmanifest    可加到手機主畫面
+claude-artifact/
+  fridge-recipe.html      claude.ai 手機版的原始檔（見下方「手機版」）
 ```
 
 - 影像辨識與食譜產生都使用 Claude（`claude-opus-5-5`），透過結構化輸出（Zod schema）取得固定格式的 JSON，前端不需要解析自由文字。
@@ -53,6 +55,20 @@ repo 裡的 `render.yaml` 已經寫好服務設定（Node 環境、新加坡區�
 之後每次推送到 repo 的預設分支，Render 都會自動重新部署。
 
 免費方案的服務閒置約 15 分鐘後會休眠，下次開啟需等 30 到 60 秒喚醒。要避免休眠，把 `render.yaml` 中的 `plan: free` 改成 `plan: starter`（付費方案）。
+
+## 手機版（claude.ai）
+
+除了上面的伺服器版，還有一個直接在 claude.ai 上執行的手機版：
+
+https://claude.ai/artifact/5S3b1fr7pYAvimG6vTsQzE
+
+原始檔是 `claude-artifact/fridge-recipe.html`。
+
+- 用手機的 Claude App 或瀏覽器登入 claude.ai 後打開即可使用。
+- 不需要 API 金鑰，也不需要架伺服器；辨識與推薦使用開啟者自己的 Claude 帳號額度。第一次使用時，頁面會請你允許它使用 Claude 和傳送照片。
+- 頁面預設是私人的，要給別人用，從頁面的「Share」選單分享。
+- 這個檔案只能在 claude.ai 上運作，直接用瀏覽器打開本機檔案會顯示「無法使用 Claude」，所以刻意不放在 `public/`。
+- 修改原始檔後，要請 Claude 重新發佈到同一個網址，線上頁面才會更新。
 
 ## 可以調整的地方
 

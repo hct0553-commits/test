@@ -1,0 +1,269 @@
+<title>冰箱料理助手</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@900&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday
+   IDEA a red-and-white market bag and a handwritten recipe card from a Taiwanese kitchen
+   PICTURE the ingredient chips and recipe cards themselves, drawn large
+   COLOUR warm white ground, ink, market red, leaf green
+   TYPE Noto Serif TC 900 display + Noto Sans TC text
+   LAYOUT one column: title, photo step, ingredient chips, recipes; same on phone */
+:root{color-scheme:light dark;--bg:light-dark(#fffaf3,#1a1614);--surface:light-dark(#ffffff,#25201d);--ink:light-dark(#231c18,#f3ece5);--muted:light-dark(#6e6259,#b8aca2);--red:light-dark(#c8202c,#ef6a5f);--red-ink:light-dark(#ffffff,#1a1614);--leaf:light-dark(#2f7d3a,#7cc487);--chip:light-dark(#f6ece2,#352d28);--line:light-dark(#eadfd3,#3b332e);--warn:light-dark(#fff1cf,#3b3016);--warn-ink:light-dark(#6f5200,#f0d48a)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;overflow-x:clip}
+.stripe{height:14px;background:repeating-linear-gradient(90deg,var(--red) 0 22px,var(--bg) 22px 44px)}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+h1{font:900 clamp(34px,7vw,48px)/1.05 "Noto Serif TC",serif;letter-spacing:-.02em;margin:8px 0 6px}
+.lede{margin:0 0 20px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+h2{font-size:19px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:var(--red-ink);font-size:15px;flex-shrink:0}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 16px "Noto Sans TC",sans-serif;cursor:pointer}
+.btn.main{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.btn.wide{width:100%;margin-top:16px;font-size:17px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.chip button:focus-visible,input:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+#preview{display:block;width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-top:14px}
+.status{margin:12px 0 0;color:var(--muted)}
+.status:empty{display:none}
+.status.err{color:var(--red)}
+.status.busy::before{content:"";display:inline-block;width:14px;height:14px;margin-right:8px;border:2px solid var(--line);border-top-color:var(--red);border-radius:50%;vertical-align:-2px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.status.busy::before{animation:none}}
+.hint{margin:0 0 12px;color:var(--muted);font-size:15px}
+.note{margin:0 0 12px;padding:8px 12px;border-radius:8px;background:var(--warn);color:var(--warn-ink);font-size:15px}
+.chips{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:2px;padding:4px 4px 4px 14px;border-radius:999px;background:var(--chip);font-size:17px}
+.chip.unsure{outline:1.5px dashed var(--muted)}
+.chip button{border:0;background:none;color:var(--muted);font-size:20px;width:34px;height:34px;border-radius:50%;cursor:pointer}
+.add{display:flex;gap:8px;margin-top:14px}
+.add input{flex:1;min-height:46px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:16px "Noto Sans TC",sans-serif}
+.sample{font-size:13px;color:var(--muted);margin:10px 0 0}
+.sec{font:900 26px/1.1 "Noto Serif TC",serif;margin:28px 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--red);border-radius:14px;padding:18px;margin-bottom:16px}
+.card h3{font:900 26px/1.15 "Noto Serif TC",serif;margin:0}
+.meta{margin:6px 0 4px;color:var(--red);font-size:14px;font-weight:500}
+.desc{margin:0;color:var(--muted)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 20px}
+.card h4{margin:16px 0 4px;font-size:15px}
+.card ul,.card ol{margin:0;padding-left:1.3em}
+.card ol li{margin-bottom:8px}
+.miss li{color:var(--red)}
+.tip{margin:16px 0 0;padding:10px 12px;border-left:4px solid var(--leaf);background:var(--chip);border-radius:0 8px 8px 0}
+@media(max-width:600px){.cols{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="stripe"></div>
+<div class="wrap">
+  <h1>冰箱料理助手</h1>
+  <p class="lede">拍一張食材照片，看看今晚能煮什麼台灣家常菜。</p>
+
+  <section class="panel">
+    <h2><span class="num">1</span>拍下你的食材</h2>
+    <div class="row">
+      <label class="btn main">拍照<input type="file" id="camera" accept="image/jpeg,image/png,image/webp" capture="environment" hidden></label>
+      <label class="btn">從相簿選擇<input type="file" id="album" accept="image/jpeg,image/png,image/webp" hidden></label>
+    </div>
+    <img id="preview" alt="食材照片預覽" hidden>
+    <p class="status" id="photoStatus" role="status"></p>
+  </section>
+
+  <section class="panel">
+    <h2><span class="num">2</span>確認食材</h2>
+    <p class="hint">點 × 刪除認錯的，也可以補上照片沒拍到的，用「、」分隔可一次加好幾樣。</p>
+    <p class="note" id="note" hidden></p>
+    <ul class="chips" id="chips"></ul>
+    <form class="add" id="addForm">
+      <input type="text" id="addInput" placeholder="新增食材，例如：豆腐" maxlength="40" autocomplete="off">
+      <button type="submit" class="btn">新增</button>
+    </form>
+    <p class="sample" id="sampleNote">目前是範例食材，拍照後會換成你的。</p>
+    <button class="btn main wide" id="cook">推薦料理</button>
+    <p class="status" id="cookStatus" role="status"></p>
+  </section>
+
+  <section id="results" hidden>
+    <h2 class="sec">可以做的菜</h2>
+    <div id="cards"></div>
+  </section>
+</div>
+
+<template id="cardTpl">
+  <article class="card">
+    <h3 class="name"></h3>
+    <p class="meta"></p>
+    <p class="desc"></p>
+    <div class="cols">
+      <div><h4>使用食材</h4><ul class="used"></ul></div>
+      <div><h4>調味料</h4><ul class="season"></ul></div>
+    </div>
+    <div class="missBlock"><h4>需另外準備</h4><ul class="miss"></ul></div>
+    <h4>做法</h4>
+    <ol class="steps"></ol>
+    <p class="tip"></p>
+  </article>
+</template>
+
+<script>
+{
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    items: ["雞蛋", "芥蘭", "青蔥", "薑", "蒜頭", "牛番茄"].map((name) => ({ name, unsure: false })),
+    isSample: true,
+  };
+  let sample = null;
+
+  const ERRORS = {
+    not_granted: "需要允許這個頁面使用 Claude 才能辨識與推薦。",
+    sampling_disabled: "這個帳號目前無法使用 Claude。",
+    rate_limited: "使用次數暫時太多，請稍後再試。",
+    image_rejected: "這張照片無法讀取，請換一張 JPEG 或 PNG。",
+    images_unavailable: "目前的檢視環境無法傳送照片，請改用手動輸入食材。",
+    refused: "這張照片或這組食材無法處理，請換一張再試。",
+    invalid_json: "回應格式不完整，請再按一次。",
+    session_expired: "登入已過期，請重新登入 Claude。",
+  };
+  const errText = (e) => ERRORS[e?.code] || "連線出了點問題，請再試一次。";
+
+  function setStatus(id, text, kind) {
+    const el = $(id);
+    el.textContent = text;
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function renderChips() {
+    const ul = $("chips");
+    ul.replaceChildren();
+    state.items.forEach((item, i) => {
+      const li = document.createElement("li");
+      li.className = "chip" + (item.unsure ? " unsure" : "");
+      const span = document.createElement("span");
+      span.textContent = item.name + (item.unsure ? "？" : "");
+      const x = document.createElement("button");
+      x.type = "button";
+      x.textContent = "×";
+      x.setAttribute("aria-label", "刪除" + item.name);
+      x.onclick = () => { state.items.splice(i, 1); renderChips(); };
+      li.append(span, x);
+      ul.append(li);
+    });
+    $("sampleNote").hidden = !state.isSample;
+    $("cook").disabled = state.items.length === 0 || !sample;
+  }
+
+  $("addForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const names = $("addInput").value.split(/[、,，\s]+/).map((s) => s.trim()).filter(Boolean);
+    for (const name of names) {
+      if (!state.items.some((it) => it.name === name)) state.items.push({ name, unsure: false });
+    }
+    $("addInput").value = "";
+    renderChips();
+  });
+
+  for (const input of [$("camera"), $("album")]) {
+    input.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (file) await recognize(file);
+    });
+  }
+
+  async function recognize(file) {
+    if (!sample) return setStatus("photoStatus", "Claude 尚未連上，請稍候再試。", "err");
+    const url = URL.createObjectURL(file);
+    $("preview").src = url;
+    $("preview").hidden = false;
+    setStatus("photoStatus", "正在辨識食材……", "busy");
+    try {
+      const data = await sample.json(
+        "你是熟悉台灣傳統市場的料理助手。這張照片是冰箱內部、流理台或購物袋裡的食材。\n" +
+        "請列出照片中看得到的可食用食材，使用台灣常用的繁體中文名稱（例如：芥蘭、空心菜、地瓜葉、青江菜、牛番茄、板豆腐）。\n" +
+        "外觀容易混淆的（例如芥蘭與菜心、青蔥與蒜苗）把 unsure 設為 true，並在 note 中簡短說明。不要列出看不清楚的東西或非食材，同一種只列一次。\n" +
+        '只回覆一個 JSON 物件：{"ingredients":[{"name":"雞蛋","unsure":false}],"note":""}。沒有要提醒的事，note 留空字串。',
+        { images: file },
+      );
+      const list = Array.isArray(data?.ingredients) ? data.ingredients : [];
+      state.items = list
+        .filter((it) => it && typeof it.name === "string" && it.name.trim())
+        .map((it) => ({ name: it.name.trim().slice(0, 30), unsure: it.unsure === true }));
+      state.isSample = false;
+      const note = typeof data?.note === "string" ? data.note.trim() : "";
+      $("note").textContent = note;
+      $("note").hidden = !note;
+      renderChips();
+      setStatus("photoStatus", state.items.length ? `找到 ${state.items.length} 樣食材，請到下方確認。` : "照片中沒找到食材，換個角度再拍一次看看。", state.items.length ? "" : "err");
+    } catch (e) {
+      setStatus("photoStatus", errText(e), "err");
+    }
+  }
+
+  $("cook").addEventListener("click", async () => {
+    const btn = $("cook");
+    btn.disabled = true;
+    setStatus("cookStatus", "師傅正在想菜單……", "busy");
+    try {
+      const data = await sample.json(
+        "你是台灣家常菜老師傅。我手邊的食材有：" + state.items.map((it) => it.name).join("、") + "。\n" +
+        "請推薦 3 到 5 道可以做的台灣中式家常菜（熱炒、湯品、涼拌、蒸煮、煎烤、滷燉都可以），菜色不要重複。\n" +
+        "原則：優先推薦只用手邊食材加家常調味料就能完成的菜，需要另外買食材的排後面。鹽、糖、醬油、米酒、香油、白胡椒粉、蠔油、烏醋、食用油、太白粉視為家裡已有，寫在 seasonings，不要放進 missing。份量用台灣家庭習慣的單位（大匙、小匙、顆、把、瓣）。步驟要具體到火候與時間，讓不常下廚的人也能照做。\n" +
+        '只回覆一個 JSON 陣列，每道菜的格式：{"name":"番茄炒蛋","category":"熱炒","description":"一句話介紹","minutes":15,"difficulty":"簡單","servings":"2 人份","used":["雞蛋 3 顆"],"missing":[],"seasonings":["鹽 1/2 小匙"],"steps":["步驟一"],"tip":"一個小訣竅"}',
+      );
+      const recipes = Array.isArray(data) ? data : Array.isArray(data?.recipes) ? data.recipes : [];
+      if (!recipes.length) throw { code: "invalid_json" };
+      renderRecipes(recipes);
+      setStatus("cookStatus", "");
+      $("results").hidden = false;
+      $("results").scrollIntoView({ behavior: "smooth" });
+    } catch (e) {
+      setStatus("cookStatus", errText(e), "err");
+    } finally {
+      btn.disabled = state.items.length === 0;
+    }
+  });
+
+  const arr = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim()) : []);
+  function fill(list, items) {
+    for (const t of items) { const li = document.createElement("li"); li.textContent = t; list.append(li); }
+  }
+
+  function renderRecipes(recipes) {
+    const box = $("cards");
+    box.replaceChildren();
+    for (const r of recipes) {
+      const card = $("cardTpl").content.cloneNode(true);
+      const q = (s) => card.querySelector(s);
+      q(".name").textContent = String(r.name || "未命名料理");
+      q(".meta").textContent = [r.category, r.minutes ? `約 ${r.minutes} 分鐘` : "", r.difficulty, r.servings].filter(Boolean).map(String).join("｜");
+      q(".desc").textContent = String(r.description || "");
+      fill(q(".used"), arr(r.used));
+      fill(q(".season"), arr(r.seasonings));
+      fill(q(".steps"), arr(r.steps));
+      const miss = arr(r.missing);
+      if (miss.length) fill(q(".miss"), miss); else q(".missBlock").remove();
+      if (r.tip) q(".tip").textContent = "小訣竅：" + String(r.tip); else q(".tip").remove();
+      box.append(card);
+    }
+  }
+
+  renderChips();
+  (window.claude?.use ? window.claude.use("sample") : Promise.resolve(null)).then(async (s) => {
+    sample = s;
+    if (!s) {
+      setStatus("cookStatus", "這個檢視環境無法使用 Claude，請在 Claude App 或 claude.ai 中開啟。", "err");
+      return;
+    }
+    const caps = await s.limits().catch(() => null);
+    if (!caps?.images) {
+      document.querySelectorAll("label.btn").forEach((l) => (l.hidden = true));
+      setStatus("photoStatus", "這個檢視環境無法傳照片，請直接在下方輸入食材。", "err");
+    }
+    renderChips();
+  });
+}
+</script>
